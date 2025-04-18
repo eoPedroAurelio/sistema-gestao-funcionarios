@@ -74,7 +74,7 @@ export default function AppSidebar() {
       </SidebarContent>
       <SidebarFooter>
         <div className="p-4 text-xs text-muted-foreground">
-          <p>© 2024 Sistema de Gestão</p>
+          <p>© 2025 Sistema de Gestão</p>
         </div>
       </SidebarFooter>
     </Sidebar>
