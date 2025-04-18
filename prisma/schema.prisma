@@ -1,0 +1,86 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  // Adicionar esta linha para garantir que o Prisma Client seja gerado corretamente
+  output   = ".prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Funcionario {
+  id              String            @id @default(uuid())
+  nome            String
+  email           String            @unique
+  cpf             String            @unique
+  cargo           String
+  salario         Float
+  dataContratacao DateTime
+  departamentoId  String
+  supervisorId    String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  // Relacionamentos
+  departamento    Departamento      @relation(fields: [departamentoId], references: [id])
+  supervisor      Funcionario?      @relation("SupervisorSubordinado", fields: [supervisorId], references: [id])
+  subordinados    Funcionario[]     @relation("SupervisorSubordinado")
+  perfil          Perfil?
+  historicoCargos HistoricoCargo[]
+
+  @@map("funcionarios")
+}
+
+model Perfil {
+  id            String     @id @default(uuid())
+  funcionarioId String     @unique
+  idade         Int
+  endereco      String
+  telefone      String
+  genero        String
+  estadoCivil   String
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  // Relacionamentos
+  funcionario   Funcionario @relation(fields: [funcionarioId], references: [id], onDelete: Cascade)
+
+  @@map("perfis")
+}
+
+model Departamento {
+  id          String       @id @default(uuid())
+  nome        String
+  orcamento   Float
+  localizacao String
+  dataCriacao DateTime
+  descricao   String?      // Novo campo opcional
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  // Relacionamentos
+  funcionarios Funcionario[]
+
+  @@map("departamentos")
+}
+
+model HistoricoCargo {
+  id              String     @id @default(uuid())
+  funcionarioId   String
+  cargoAnterior   String
+  novoCargo       String
+  dataAlteracao   DateTime
+  motivo          String
+  aprovadoPor     String
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  // Relacionamentos
+  funcionario     Funcionario @relation(fields: [funcionarioId], references: [id], onDelete: Cascade)
+
+  @@map("historico_cargos")
+}
